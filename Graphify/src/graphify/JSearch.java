@@ -20,29 +20,28 @@ import org.jsoup.select.Elements;
  * @author Ayomitunde
  */
 public class JSearch {
+
     private static final String _userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
     private List<String> links = new LinkedList<>();
     private Document doc;
     private boolean found = false;
-    static String nextSearchWord = "";
-    
-    public boolean strip(String url, String searchWord) throws IOException{
-        try{
+
+    public boolean strip(String url, String searchWord) throws IOException {
+        try {
             Connection conn = Jsoup.connect(url).userAgent(_userAgent);
             Document hdoc = conn.get();
             doc = hdoc;
-            if(conn.response().statusCode() == 200) // ok
+            if (conn.response().statusCode() == 200) // ok
             {
-                System.out.println("Visiting "+url);
+                //System.out.println("Visiting "+url);
             }
-            if(!conn.response().contentType().contains("text/html"))
-            {
-                System.out.println("No html here");
+            if (!conn.response().contentType().contains("text/html")) {
+                //System.out.println("No html here");
                 return false;
             }
             Elements allLinks = hdoc.select("a[href*=/define.php?term]");
-            Elements badLinks = hdoc.select("a[href*="+searchWord+"&]");
-            Elements languages = hdoc.select("a[href*=urbandictionary.com/define.php?term="+searchWord+"]");
+            Elements badLinks = hdoc.select("a[href*=" + searchWord + "&]");
+            Elements languages = hdoc.select("a[href*=urbandictionary.com/define.php?term=" + searchWord + "]");
             allLinks.removeAll(badLinks);
             allLinks.removeAll(languages);
 //            System.out.println("-------------------Languages------------------");
@@ -52,61 +51,54 @@ public class JSearch {
 //            System.out.println("-------------------Bad Links------------------");
 //            System.out.println(badLinks);
 //            System.exit(0);
-            for(Element l : allLinks)
-            {
+            allLinks.stream().forEach((l) -> {
                 links.add(l.absUrl("href"));
-            }
+            });
             return true;
-        }catch(IOException ioe)
-        {
+        } catch (IOException ioe) {
             return false;
         }
     }
-    
-    public boolean searchWord(String searchWord)
-    {
-        if(doc == null){
+
+    public boolean searchWord(String searchWord) {
+        if (doc == null) {
             return false;
         }
         String body = doc.body().text();
         found = body.toLowerCase().contains(searchWord.toLowerCase());
-        if(found)
-        {
+        if (found) {
             Elements word = doc.select("a.word");
             Elements meaning = doc.select("div.meaning");
             String text = "";
-            for(int i = 0; i < word.size(); i++)
-            {
-                if(!Crawler.searchedText.contains(word.get(i).ownText().toLowerCase()) && text.isEmpty())
-                {
+            for (int i = 0; i < word.size(); i++) {
+                if (!Model.searchedText.contains(word.get(i).ownText().toLowerCase()) && text.isEmpty()) {
                     text = word.get(i).ownText().toLowerCase();
-                    Crawler.searchedText.add(text);
+                    Model.searchedText.add(text);
                 }
-                
+
                 String textMean = meaning.get(i).ownText();
-                Crawler._unvisited.add(word.get(i).attr("abs:href"));
-                if(Crawler.wordMeaning.containsKey(text)){
-                    ArrayList<String> textList = Crawler.wordMeaning.get(text);
+                Model._unvisited.add(word.get(i).attr("abs:href"));
+                if (Model.wordMeaning.containsKey(text)) {
+                    ArrayList<String> textList = Model.wordMeaning.get(text);
                     textList.add(textMean);
-                    Crawler.wordMeaning.put(text, textList);
-                }else{
+                    Model.wordMeaning.put(text, textList);
+                } else {
                     ArrayList<String> list = new ArrayList<>();
-                    Crawler.wordMeaning.put(text, list);
+                    Model.wordMeaning.put(text, list);
                 }
-                System.out.println(text+": "+textMean);
+                //System.out.println(text+": "+textMean);
             }
-            if(!text.isEmpty()) {
-            	System.err.println("I am text "+text);
-            	nextSearchWord = text;
-            }else{
-            	
+            if (!text.isEmpty()) {
+                //nextSearchWord = text;
+                Model.nextSearchWord = text;
+                System.err.println("I am text " + text);
             }
-        }        
+
+        }
         return found;
     }
-    
-    public List<String> getLinks()
-    {
+
+    public List<String> getLinks() {
         return links;
     }
 }

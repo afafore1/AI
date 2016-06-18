@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
@@ -17,6 +19,7 @@ public abstract class Model {
     public static Queue<Vertex> queue;
     public static Stack<Vertex> stack;
     public static String sim = null;
+    public static String nextSearchWord = "";
     public static boolean startSA = false;
     public static HashMap<Integer, Integer> distTo;
     public static HashMap<Integer, Integer> visited;
@@ -45,6 +48,10 @@ public abstract class Model {
     public static int time = 0;
     public static int toolType = -1;
     public static HashMap<Integer, Vertex> vertices;
+    public static List<String> _visited = new LinkedList<>();
+    public static List<String> _unvisited = new LinkedList<>();
+    public static HashMap<String, ArrayList<String>> wordMeaning = new HashMap<>();
+    public static List<String> searchedText = new ArrayList<>();
     public static ArrayList<Edge> edges;
     public static Queue<Vertex> suggestQueue;
     public static HashMap<Integer, HashSet<Integer>> nodes;

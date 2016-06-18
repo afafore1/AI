@@ -9,11 +9,6 @@
 package graphify;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jsoup.nodes.Document;
@@ -25,19 +20,14 @@ import org.jsoup.nodes.Document;
 public class Crawler {
     static Document doc;
     static int _maxSearch = 50;
-    static HashSet<String> _visited = new HashSet<>();
-    static List<String> _unvisited = new LinkedList<>();
-    static HashMap<String, ArrayList<String>> wordMeaning = new HashMap<>();
-    static List<String> searchedText = new ArrayList<>();
-    static String searchWord = "";
 
     public static void Crawl(String url, String searchWord) throws IOException {
-          while(_visited.size() < _maxSearch){
+        System.out.println("starting ...");
               String currentUrl;
               JSearch js = new JSearch();
-              if(_unvisited.isEmpty()){
+              if(Model._unvisited.isEmpty()){
                   currentUrl = url;
-                  _visited.add(url);
+                  Model._visited.add(url);
               }else{
                   currentUrl = nextUrl();
               }
@@ -45,11 +35,12 @@ public class Crawler {
               if(js.searchWord(searchWord))
               {
                   System.out.println("found "+searchWord+" at "+currentUrl);
-                  searchWord = JSearch.nextSearchWord;
+              }else{
+                  Model.nextSearchWord = Model.searchedText.get(1);
+                  Crawl(currentUrl, Model.nextSearchWord);
               }
-              _unvisited.addAll(js.getLinks());
-          }
-          System.out.println("Visited all ");
+              Model._unvisited.addAll(js.getLinks());
+          
     }
     
     private static String nextUrl()
@@ -57,19 +48,23 @@ public class Crawler {
         String nextUrl;
         do
         {
-            nextUrl = _unvisited.remove(0);
-        }while(_visited.contains(nextUrl) && _unvisited.size() > 0);
-        _visited.add(nextUrl);
+            nextUrl = Model._unvisited.remove(0);
+        }while(Model._visited.contains(nextUrl) && Model._unvisited.size() > 0);
+        Model._visited.add(nextUrl);
         return nextUrl;
     }
     
     public static void main(String [] args){
-        searchWord = "hi";
+        Model.nextSearchWord = "hi";
         try {
-            Crawl("http://www.urbandictionary.com/define.php?term=hi", searchWord);
+            while(Model._visited.size() < _maxSearch){
+                Crawl("http://www.urbandictionary.com/define.php?term=hi", Model.nextSearchWord);
+            }
         } catch (IOException ex) {
             Logger.getLogger(Crawler.class.getName()).log(Level.SEVERE, null, ex);
         }
+        System.out.println(Model.wordMeaning.toString());
+        System.out.println("Visited all ");
     }
     
 }
