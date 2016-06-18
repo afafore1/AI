@@ -10,9 +10,6 @@ Several algorithms have been added to this application are visualized.
 - Open project in Netbeans or your favorite Java IDE
 - Run the application
 
-**Download and Run**
-- Tools like placing vertex, edges can be selected from the side panel
-
 *Contributors*
 - Ayomitunde Fafore
 - Jack Le
